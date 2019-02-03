@@ -55,6 +55,18 @@ namespace Registration.Sample
             // return Task.Run(() => Task.Delay(msDelay).ContinueWith(_ => "Hello" + name));
         }
 
+        public static int globalCount = 0;
+
+        // RTD with multiple allow reference args will block caculation #221
+        [ExcelFunction]
+        public static Task<string> eval([ExcelArgument(AllowReference = true)] object arg1, [ExcelArgument(AllowReference = true)] object arg2)
+        {
+            globalCount++;
+            return Task.Factory.StartNew(() => Delay(1000).ContinueWith(_ => "Hello" + globalCount)).Unwrap();
+            // With .NET 4.5 one would do:
+            // return Task.Run(() => Task.Delay(msDelay).ContinueWith(_ => "Hello" + name));
+        }
+
         // .NET 4.5 function with async/await
         // Change the Example project's target runtime and uncomment
         //[ExcelAsyncFunction]
